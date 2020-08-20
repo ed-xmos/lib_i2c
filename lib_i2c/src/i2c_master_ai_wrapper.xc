@@ -6,7 +6,7 @@
 
 
 
-i2c_res_t i2c_master_write(uint8_t device_addr, uint8_t buf[n], size_t n,
+i2c_res_t i2c_master_write(uint8_t device_addr, uint8_t buf[], size_t n,
            size_t *num_bytes_sent, int send_stop_bit, 
            i2c_master_config_t *config){
     interface i2c_master_if i_i2c[1];
@@ -22,7 +22,7 @@ i2c_res_t i2c_master_write(uint8_t device_addr, uint8_t buf[n], size_t n,
     return result;
 }
 
-i2c_res_t i2c_master_read(uint8_t device_addr, uint8_t buf[n], size_t n,
+i2c_res_t i2c_master_read(uint8_t device_addr, uint8_t buf[], size_t n,
            int send_stop_bit, i2c_master_config_t *config){
     interface i2c_master_if i_i2c[1];
     i2c_res_t result;

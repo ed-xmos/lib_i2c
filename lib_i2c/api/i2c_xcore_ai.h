@@ -17,19 +17,31 @@ typedef enum {
   I2C_ACK,     ///< the slave has ACKed the last byte
 } i2c_res_t;
 
+/** This type is used by the supplementary I2C register read/write functions to
+ *  report back on whether the operation was a success or not.
+ */
+typedef enum {
+  I2C_REGOP_SUCCESS,     ///< the operation was successful
+  I2C_REGOP_DEVICE_NACK, ///< the operation was NACKed when sending the device address, so either the device is missing or busy
+  I2C_REGOP_INCOMPLETE   ///< the operation was NACKed halfway through by the slave
+} i2c_regop_res_t;
+
+
 typedef struct {
-  port_t p_sda;
   port_t p_scl;
+  port_t p_sda;
   unsigned kbits_per_second;
 } i2c_master_config_t;
 
 #else //XC
 
 typedef struct {
-  port p_sda;
   port p_scl;
+  port p_sda;
   unsigned kbits_per_second;
 } i2c_master_config_t;
+
+#endif
 
 #define BIT_TIME(KBITS_PER_SEC) ((XS1_TIMER_MHZ * 1000) / KBITS_PER_SEC)
 #define BIT_MASK(BIT_POS) (1 << BIT_POS)
@@ -56,7 +68,7 @@ typedef struct {
 *  \returns               ``I2C_ACK`` if the write was acknowledged by the slave
 *                         device, otherwise ``I2C_NACK``.
 */
-i2c_res_t i2c_master_write(uint8_t device_addr, uint8_t buf[n], size_t n,
+i2c_res_t i2c_master_write(uint8_t device_addr, uint8_t buf[], size_t n,
            size_t *num_bytes_sent, int send_stop_bit, 
            i2c_master_config_t *config);
 
@@ -77,7 +89,7 @@ i2c_res_t i2c_master_write(uint8_t device_addr, uint8_t buf[n], size_t n,
 *  \returns               ``I2C_ACK`` if the read was acknowledged by the slave
 *                         device, otherwise ``I2C_NACK``.
 */
-i2c_res_t i2c_master_read(uint8_t device_addr, uint8_t buf[n], size_t n,
+i2c_res_t i2c_master_read(uint8_t device_addr, uint8_t buf[], size_t n,
            int send_stop_bit, i2c_master_config_t *config);
 
 /** Send a stop bit.
@@ -91,16 +103,7 @@ i2c_res_t i2c_master_read(uint8_t device_addr, uint8_t buf[n], size_t n,
 */
 void i2c_master_send_stop_bit(i2c_master_config_t *config);
 
-#ifndef __XC__
-/** This type is used by the supplementary I2C register read/write functions to
- *  report back on whether the operation was a success or not.
- */
-typedef enum {
-  I2C_REGOP_SUCCESS,     ///< the operation was successful
-  I2C_REGOP_DEVICE_NACK, ///< the operation was NACKed when sending the device address, so either the device is missing or busy
-  I2C_REGOP_INCOMPLETE   ///< the operation was NACKed halfway through by the slave
-} i2c_regop_res_t;
-#endif
+
 
   /** Read an 8-bit register on a slave device.
    *
@@ -122,7 +125,7 @@ typedef enum {
    *
    *  \returns           the value of the register
    */
-  inline uint8_t read_reg(uint8_t device_addr, uint8_t reg,
+  inline uint8_t i2c_master_read_reg(uint8_t device_addr, uint8_t reg,
                           i2c_regop_res_t *result, i2c_master_config_t *config) {
     uint8_t a_reg[1] = {reg};
     uint8_t data[1] = {0};
@@ -155,7 +158,7 @@ typedef enum {
    *  \param data        the 8-bit value to write
    *  \param config      ports and bus speed
    */
-  inline i2c_regop_res_t write_reg(uint8_t device_addr, uint8_t reg, uint8_t data,
+  inline i2c_regop_res_t i2c_master_write_reg(uint8_t device_addr, uint8_t reg, uint8_t data,
                                     i2c_master_config_t *config)
   {
     uint8_t a_data[2] = {reg, data};
@@ -519,6 +522,5 @@ typedef enum {
 //                port p_scl, port p_sda,
 //                uint8_t device_addr);
 
-#endif // __XC__
 
 #endif
