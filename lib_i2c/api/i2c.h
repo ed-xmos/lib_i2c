@@ -94,7 +94,7 @@ typedef enum {
 
 
 extends client interface i2c_master_if : {
-
+#if 0 //WE_HAVE_MOVED_THIS_TO_THE_AI_WRAPPER
   /** Read an 8-bit register on a slave device.
    *
    *  This function reads an 8-bit addressed, 8-bit register from the i2c
@@ -163,6 +163,8 @@ extends client interface i2c_master_if : {
     }
     return I2C_REGOP_SUCCESS;
   }
+#endif //WE_HAVE_MOVED_THIS_TO_THE_AI_WRAPPER
+#ifdef SUPPORT_FOR_16B_SLAVES
 
   /** Read an 8-bit register on a slave device from a 16-bit register address.
    *
@@ -386,6 +388,8 @@ extends client interface i2c_master_if : {
     }
     return I2C_REGOP_SUCCESS;
   }
+#endif // SUPPORT_FOR_16B_SLAVES
+
 }
 
 
